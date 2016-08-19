@@ -1,0 +1,38 @@
+{
+  "name": "vulcain-users",
+  "version": "1.0.0-rc.18",
+  "description": "Vulcain user management",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "typings": "dist/index.d.ts",
+  "author": "Alain Metge",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "typescript": "~1.8.0",
+    "fs-extra": "~0.26.0",
+    "gulp": "~3.9.0",
+    "gulp-concat": "~2.6.0",
+    "gulp-sourcemaps": "~1.6.0",
+    "gulp-typescript": "~2.10.0",
+    "merge2": "~1.0.0",
+    "tslint": "~3.13.0",
+    "gulp-tslint": "~6.0.0",
+    "typings": "~1.0.0",
+    "chai": "~3.5.0",
+    "sinon": "~1.17.0",
+    "gulp-istanbul": "~1.0.0",
+    "gulp-mocha": "~2.2.0"
+  },
+  "dependencies": {
+    "jsonwebtoken": "~7.0.0",
+    "ms": "^0.7.1",
+    "node-bcrypt": "~0.0.1",
+    "passport": "~0.3.0",
+    "passport-http": "~0.3.0",
+    "passport-http-bearer": "~1.0.0",
+    "passport-strategy": "~1.0.0",
+    "vulcain-corejs": "~1.0.0-rc"
+  }
+}
