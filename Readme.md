@@ -1,2 +1,2 @@
-# Template micro-service en node
+# Authentication library for using with a vulcain microservice
 
