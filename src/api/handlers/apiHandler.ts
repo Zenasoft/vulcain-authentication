@@ -8,11 +8,11 @@ import {
     DefaultActionHandler,
     QueryHandler,
     DefaultQueryHandler,
-    ActionEventMode
+    EventNotificationMode
 } from "vulcain-corejs";
 import {ApiKey} from "../models/apiKey";
 
-@ActionHandler({async:false, scope:"token-admin",  schema:"ApiKey", serviceName:"ApiKeyService", eventMode: ActionEventMode.never})
+@ActionHandler({async:false, scope:"token-admin",  schema:"ApiKey", serviceName:"ApiKeyService", eventMode: EventNotificationMode.never})
 export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
 
     constructor(

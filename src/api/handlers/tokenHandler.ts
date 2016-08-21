@@ -1,6 +1,6 @@
 import {ITokenService, IQueryUserService} from "../services";
 import * as fs from "fs";
-import {Domain, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, ActionEventMode} from "vulcain-corejs";
+import {Domain, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode} from "vulcain-corejs";
 var jwt = require('jsonwebtoken');
 var ms = require('ms');
 
@@ -10,7 +10,7 @@ export class RenewData {
     renewToken: string;
 }
 
-@ActionHandler({ async:false, scope:"*",  serviceName:"TokenService", eventMode: ActionEventMode.never})
+@ActionHandler({ async:false, scope:"*",  serviceName:"TokenService", eventMode: EventNotificationMode.never})
 export class TokenHandler extends AbstractActionHandler implements ITokenService {
 
     private issuer:string;
