@@ -1,7 +1,7 @@
 import {Query, QueryHandler, ActionHandler, DefaultActionHandler, DefaultQueryHandler} from "vulcain-corejs";
 import {User} from "../models/user";
 import {IQueryUserService} from "../services";
-const bcrypt = require('node-bcrypt');
+import * as crypto from 'crypto';
 
 @ActionHandler({async:false, scope:"user-admin", schema:"User", serviceName:"UserService"})
 export class UserHandler extends DefaultActionHandler
@@ -26,6 +26,6 @@ class QueryUserService extends DefaultQueryHandler<User> {
     }
 
     verifyPassword(hash, plain) {
-        return hash && bcrypt.checkpw(plain, hash);
+        return hash && User.verifyPassword(hash, plain);
     }
 }

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import {TestContainer, DefaultActionHandler, DefaultQueryHandler, QueryHandler, Query, ActionHandler, Model, Property, RequestContext, IContainer} from 'vulcain-corejs';
 
-@Model("TestModel")
+@Model()
 class TestModel {
     @Property({type:"string", required: true})
     firstName: string;
@@ -20,7 +20,7 @@ class TestActionHandler extends DefaultActionHandler {
 }
 
 @QueryHandler({scope:"?", schema:TestModel, serviceName:"TestQueryService"})
-class TestQueryHandler extends DefaultQueryHandler {
+class TestQueryHandler extends DefaultQueryHandler<TestModel> {
     constructor(container: IContainer) {
         super(container);
         this.requestContext = RequestContext.createMock(container);
@@ -45,12 +45,13 @@ describe("Default action handler", function () {
             let entity = { firstName: "elvis", lastName: "Presley" };
             await actionHandler.createAsync(entity);
             let query:any = container.get("TestQueryService");
-            entity = await query.getAsync("presley");
+            entity = await query.getAsync("Presley");
             expect(entity).to.be.not.null;
             done();
         }
         catch (e) {
             console.log(e);
+            done(e);
         }
     });
 

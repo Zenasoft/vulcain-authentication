@@ -1,5 +1,7 @@
 import {Property, Model, Reference} from 'vulcain-corejs';
-const bcrypt = require('node-bcrypt');
+import * as crypto from 'crypto';
+
+const saltSize = 32;
 
 @Model( {
     onHttpResponse: (e: User) => { delete e.password; },
@@ -27,9 +29,20 @@ export class User
 
     static bind(user: User) {
         if (user.password) {
-            const salt = bcrypt.gensalt();
-            user.password = bcrypt.hashpw(user.password, salt);
+            user.password = User.encryptPassword(user.password);
         }
         return user;
+    }
+
+    static encryptPassword(plainText: string, salt?) {
+        salt = salt && new Buffer(salt, 'hex') || crypto.randomBytes(saltSize);
+        const encryptedPassword =  crypto.pbkdf2Sync(plainText, salt, 2000, 64, 'sha512').toString('hex');
+        return encryptedPassword + salt.toString('hex');
+    }
+
+    static verifyPassword(encryptedText: string, plainText: string) {
+        const pos = encryptedText.length - (saltSize*2);
+        const salt = encryptedText.substr(pos);
+        return User.encryptPassword(plainText, salt) === encryptedText;
     }
 }

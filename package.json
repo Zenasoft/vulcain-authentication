@@ -1,6 +1,6 @@
 {
   "name": "vulcain-users",
-  "version": "1.0.0-rc.20",
+  "version": "1.0.0-rc.22",
   "description": "Vulcain user management",
   "main": "dist/index.js",
   "files": [
@@ -28,7 +28,6 @@
   "dependencies": {
     "jsonwebtoken": "~7.0.0",
     "ms": "^0.7.1",
-    "node-bcrypt": "~0.0.1",
     "passport": "~0.3.0",
     "passport-http": "~0.3.0",
     "passport-http-bearer": "~1.0.0",
