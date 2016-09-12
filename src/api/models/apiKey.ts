@@ -1,6 +1,6 @@
 import {Property, Model, Reference} from 'vulcain-corejs';
 
-@Model({ storageName: "tokens", encryptData:true })
+@Model({ storageName: "tokens" })
 export class ApiKey
 {
     @Property({type:"string", required:false, isKey:true})
@@ -13,5 +13,7 @@ export class ApiKey
     userId: string;
     @Property({type:"string", required: true})
     userName: string;
+    @Property({ type: "string" })
+    tenant: string;
 }
 

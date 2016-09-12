@@ -4,7 +4,6 @@ import * as crypto from 'crypto';
 const saltSize = 32;
 
 @Model( {
-    onHttpResponse: (e: User) => { delete e.password; },
     bind: User.bind,
     storageName: "users"
 })
@@ -15,7 +14,7 @@ export class User
     @Property({type:"string", unique:true, required:true})
     name:string;
     @Property({type:"string", required:false})
-    password:string;
+    password: string;
     @Property({type:"string", required:true})
     displayName:string;
     @Property({type:"string"})

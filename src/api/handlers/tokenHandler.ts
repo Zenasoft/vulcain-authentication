@@ -77,7 +77,8 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
                             displayName:ctx.user.displayName,
                             id:ctx.user.id,
                             email:ctx.user.email,
-                            name: ctx.user.name
+                            name: ctx.user.name,
+                            tenant: this.requestContext.tenant
                         },
                         scopes: ctx.user.scopes
                     }
@@ -133,10 +134,17 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
 
                 jwt.verify( jwtToken, key, options, (err, payload) =>
                 {
-                    if(err)
+                    if (err)
                         reject(err);
-                    else
-                        resolve(payload.value);
+                    else {
+                        const token = payload.value;
+                        if (token.tenant !== this.requestContext.tenant) {
+                            reject({ message: "Invalid tenant" });
+                        }
+                        else {
+                            resolve(token);
+                        }
+                    }
                 });
             }
             catch(err)
