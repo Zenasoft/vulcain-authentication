@@ -15,5 +15,7 @@ export class ApiKey
     userName: string;
     @Property({ type: "string" })
     tenant: string;
+    @Reference({item:"any", cardinality:"one"})
+    data: any;
 }
 

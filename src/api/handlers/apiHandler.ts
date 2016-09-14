@@ -25,7 +25,7 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
 
     @Action()
     createApiKey(data: ApiKey) {
-        data.tenant = this.requestContext.tenant;
+        data.tenant = data.tenant || this.requestContext.tenant;
         return super.createAsync(data);
     }
 
@@ -48,7 +48,7 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
                         reject({ message: "Invalid tenant" });
                     }
                     else {
-                        resolve({ token: token, user: { name: token.userName, id: token.userId, scopes: token.scopes } });
+                        resolve({ token: token, user: { name: token.userName, id: token.userId, tenant: token.tenant, data: token.data } });
                     }
                     return;
                 }
