@@ -8,11 +8,15 @@ import {
     DefaultActionHandler,
     QueryHandler,
     DefaultQueryHandler,
-    EventNotificationMode
+    EventNotificationMode,
+    Model,
+    Property,
+    VerifyTokenParameter,
+    DefaultServiceNames
 } from "vulcain-corejs";
 import {ApiKey} from "../models/apiKey";
 
-@ActionHandler({async:false, scope:"token-admin",  schema:"ApiKey", serviceName:"ApiKeyService", eventMode: EventNotificationMode.never})
+@ActionHandler({async:false, scope:"token-admin",  schema:"ApiKey", serviceName:DefaultServiceNames.ApiKeyService, eventMode: EventNotificationMode.never})
 export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
 
     constructor(
@@ -29,22 +33,17 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
         return super.createAsync(data);
     }
 
-    verifyTokenAsync( apiKey ) : Promise<boolean>
+    @Action()
+    verifyTokenAsync( params: VerifyTokenParameter ) : Promise<boolean>
     {
         return new Promise( async ( resolve, reject ) =>
         {
-            if(!apiKey)
-            {
-                reject("You must provided a valid token");
-                return;
-            }
-
             try
             {
-                let token = await this.apis.getApiAsync(apiKey);
+                let token = await this.apis.getApiAsync(params.apiKey);
                 if(token)
                 {
-                    if (token.tenant !== this.requestContext.tenant) {
+                    if (token.tenant !== (params.tenant || this.requestContext.tenant)) {
                         reject({ message: "Invalid tenant" });
                     }
                     else {

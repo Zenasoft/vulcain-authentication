@@ -1,6 +1,6 @@
 import {ITokenService, IQueryUserService} from "../services";
 import * as fs from "fs";
-import {Domain, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode} from "vulcain-corejs";
+import {VerifyTokenParameter, Domain, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode} from "vulcain-corejs";
 var jwt = require('jsonwebtoken');
 var ms = require('ms');
 
@@ -50,7 +50,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
 
         try
         {
-            await this.verifyTokenAsync( data.renewToken );
+            await this.verifyTokenAsync({ apiKey: data.renewToken, tenant: this.requestContext.tenant } );
         }
         catch(e)
         {
@@ -116,7 +116,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         return token;
     }
 
-    verifyTokenAsync( jwtToken ) : Promise<any>
+    verifyTokenAsync( jwtToken:VerifyTokenParameter ) : Promise<any>
     {
         return new Promise( async ( resolve, reject ) =>
         {
