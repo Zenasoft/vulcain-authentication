@@ -40,15 +40,10 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
         {
             try
             {
-                let token = await this.apis.getApiAsync(params.apiKey);
+                let token = await this.apis.getApiAsync(params.tenant, params.apiKey);
                 if(token)
                 {
-                    if (token.tenant !== (params.tenant || this.requestContext.tenant)) {
-                        reject({ message: "Invalid tenant" });
-                    }
-                    else {
-                        resolve({ token: token, user: { name: token.userName, id: token.userId, tenant: token.tenant, data: token.data } });
-                    }
+                    resolve({ token: token, user: { name: token.userName, id: token.userId, tenant: token.tenant, data: token.data } });
                     return;
                 }
                 reject({message:"Invalid api key"});
@@ -64,7 +59,8 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
 @QueryHandler({scope:"token-admin", schema: ApiKey, serviceName: "QueryApiService"})
 class QueryApiService extends DefaultQueryHandler<ApiKey> implements IQueryApiService {
     @Query({action:"get"})
-    getApiAsync(id: string) {
+    getApiAsync(tenant: string, id: string) {
+        this.requestContext.tenant = tenant;
         return <Promise<ApiKey>>super.getAsync(id);
     }
 }

@@ -41,7 +41,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
     @Action({action:"renewToken", inputSchema:"RenewData"})
     async renewTokenAsync(data: RenewData) : Promise<string>
     {
-        let user = await this._users.getUserAsync( this.requestContext.user.id );
+        let user = await this._users.getUserAsync( this.requestContext.tenant, this.requestContext.user.id );
         // No user found with that username
         if( !user || user.disabled)
         {

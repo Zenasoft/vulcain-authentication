@@ -11,12 +11,12 @@ export interface ITokenService {
 }
 
 export interface IQueryUserService {
-    getUserByNameAsync(name: string): Promise<User>;
-    getUserAsync(id: string): Promise<User>;
+    getUserByNameAsync(tenant: string, name: string): Promise<User>;
+    getUserAsync(tenant: string, id: string): Promise<User>;
     verifyPassword(original, pwd): boolean;
-    hasUsersAsync(): Promise<boolean>;
+    hasUsersAsync(tenant: string): Promise<boolean>;
 }
 
 export interface IQueryApiService {
-    getApiAsync(id: string): Promise<ApiKey>;
+    getApiAsync(tenant: string, id: string): Promise<ApiKey>;
 }

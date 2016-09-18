@@ -3,7 +3,7 @@ var passport = require('passport');
 import passportStrategy = require('passport-strategy');
 var BasicStrategy = require('passport-http').BasicStrategy;
 var BearerStrategy = require('passport-http-bearer').Strategy
-import {AuthenticationStrategies, Injectable, Inject, LifeTime, DefaultServiceNames, IContainer} from "vulcain-corejs";
+import {Conventions, RequestContext, AuthenticationStrategies, Injectable, Inject, LifeTime, DefaultServiceNames, IContainer} from "vulcain-corejs";
 import {IApiKeyService, ITokenService, IQueryUserService} from "./services";
 
 @Injectable(LifeTime.Singleton)
@@ -18,14 +18,16 @@ export class Authentication
 
     private initBasic( users:IQueryUserService )
     {
-        let strategy = new BasicStrategy( async ( username, password, callback ) =>
+        let strategy = new BasicStrategy( {passReqToCallback:true}, async ( req, username, password, callback ) =>
         {
             try
             {
+                let tenant = req.headers["X_VULCAIN_TENANT"] || process.env[Conventions.ENV_TENANT] || RequestContext.TestTenant;
+
                if(username==="admin" && password==="admin")
                {
                     // Works only on bootstrap when there is no users yet
-                    let hasUsers = (users && await users.hasUsersAsync());
+                    let hasUsers = (users && await users.hasUsersAsync(tenant));
                     if(!hasUsers)
                     {
                         return callback(null, {id:0, name:"admin", displayName:"admin"}, {scopes:"*"});
@@ -35,7 +37,7 @@ export class Authentication
                 if (!users)
                    return callback(null, false);
 
-                let user = await users.getUserByNameAsync(username);
+                let user = await users.getUserByNameAsync(tenant, username);
                 // No user found with that username
                 if( !user || user.disabled)
                 {
