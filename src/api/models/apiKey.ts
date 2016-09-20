@@ -3,7 +3,7 @@ import {Property, Model, Reference} from 'vulcain-corejs';
 @Model({ storageName: "tokens" })
 export class ApiKey
 {
-    @Property({type:"string", required:false, isKey:true})
+    @Property({type:"uid", required:false, isKey:true})
     token:string;
     @Property({type:"arrayOf", item:"string", required: true})
     scopes:Array<string>;
