@@ -30,7 +30,7 @@ export class Authentication
                     let hasUsers = (users && await users.hasUsersAsync(tenant));
                     if(!hasUsers)
                     {
-                        return callback(null, {id:0, name:"admin", displayName:"admin"}, {scopes:"*"});
+                        return callback(null, {id:0, name:"admin", displayName:"admin", scopes:"*"});
                     }
                 }
 
