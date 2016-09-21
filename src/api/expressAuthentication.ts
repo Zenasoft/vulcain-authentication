@@ -41,6 +41,7 @@ export class Authentication
                 // No user found with that username
                 if( !user || user.disabled)
                 {
+                    console.log("LOGIN: invalid user name " + username + " for tenant " + tenant);
                     return callback( null, false );
                 }
 
