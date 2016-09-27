@@ -6,7 +6,6 @@ var BearerStrategy = require('passport-http-bearer').Strategy
 import {Conventions, RequestContext, AuthenticationStrategies, Injectable, Inject, LifeTime, DefaultServiceNames, IContainer} from "vulcain-corejs";
 import {IApiKeyService, ITokenService, IQueryUserService} from "./services";
 
-@Injectable(LifeTime.Singleton)
 export class UsersAuthentication
 {
     constructor( @Inject( "QueryUserService", true )users:IQueryUserService, @Inject("TokenService")tokens:ITokenService, @Inject("ApiKeyService", true)apiKeys:IApiKeyService )
