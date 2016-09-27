@@ -1,8 +1,12 @@
 {
   "name": "service",
   "globalDependencies": {
+    "express": "registry:dt/express#4.0.0+20160708185218",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#4.0.0+20160923124352",
+    "mime": "registry:dt/mime#0.0.0+20160316155526",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd",
     "node-uuid": "registry:dt/node-uuid#0.0.0+20160316155526",
+    "passport": "registry:dt/passport#0.2.0+20160720063208",
     "passport-strategy": "registry:dt/passport-strategy#0.2.0+20160316155526",
     "rx": "github:DefinitelyTyped/DefinitelyTyped/rx/rx.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd",
     "rx-lite": "github:DefinitelyTyped/DefinitelyTyped/rx/rx-lite.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd",
@@ -21,7 +25,8 @@
     "rx.testing": "github:DefinitelyTyped/DefinitelyTyped/rx/rx.testing.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd",
     "rx.time": "github:DefinitelyTyped/DefinitelyTyped/rx/rx.time.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd",
     "rx.time-lite": "github:DefinitelyTyped/DefinitelyTyped/rx/rx.time-lite.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd",
-    "rx.virtualtime": "github:DefinitelyTyped/DefinitelyTyped/rx/rx.virtualtime.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd"
+    "rx.virtualtime": "github:DefinitelyTyped/DefinitelyTyped/rx/rx.virtualtime.d.ts#a5c07a6098b3b934380c13bb575d4ea5f3d73ffd",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160606155157"
   },
   "globalDevDependencies": {
     "chai": "registry:dt/chai#3.4.0+20160317120654",

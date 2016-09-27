@@ -7,13 +7,14 @@ import {Conventions, RequestContext, AuthenticationStrategies, Injectable, Injec
 import {IApiKeyService, ITokenService, IQueryUserService} from "./services";
 
 @Injectable(LifeTime.Singleton)
-export class Authentication
+export class UsersAuthentication
 {
     constructor( @Inject( "QueryUserService", true )users:IQueryUserService, @Inject("TokenService")tokens:ITokenService, @Inject("ApiKeyService", true)apiKeys:IApiKeyService )
     {
         this.initBasic(users);
         AuthenticationStrategies.initBearer( tokens );
-        AuthenticationStrategies.initApiKey( apiKeys );
+        AuthenticationStrategies.initApiKey(apiKeys);
+        AuthenticationStrategies.initAnonymous();
     }
 
     private initBasic( users:IQueryUserService )
@@ -68,7 +69,7 @@ export class Authentication
         passport.use( strategy );
     }
 
-    init() {return passport.authenticate( ['apiKey', 'bearer', 'basic'], { session: false } );}
+    init() {return passport.authenticate( ['apiKey', 'bearer', 'basic', 'anonymous'], { session: false } );}
 }
 
 
