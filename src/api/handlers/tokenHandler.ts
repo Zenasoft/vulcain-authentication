@@ -100,6 +100,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
                 {
                     expiresIn = this.tokenExpiration
                 }
+                // token payload contains iat (absolute expiration date in sec)
                 resolve( {expiresIn, token:jwtToken, renewToken:renewToken} );
             }
             catch(err)
