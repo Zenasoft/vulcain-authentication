@@ -27,13 +27,13 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
         super(container);
     }
 
-    @Action()
+    @Action({description:"Create an api key"})
     createApiKey(data: ApiKey) {
         data.tenant = data.tenant || this.requestContext.tenant;
         return super.createAsync(data);
     }
 
-    @Action()
+    @Action({description:"Verify an api key"})
     verifyTokenAsync( params: VerifyTokenParameter ) : Promise<boolean>
     {
         return new Promise( async ( resolve, reject ) =>
@@ -58,7 +58,7 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
 
 @QueryHandler({scope:"token-admin", schema: ApiKey, serviceName: "QueryApiService"})
 class QueryApiService extends DefaultQueryHandler<ApiKey> implements IQueryApiService {
-    @Query({action:"get"})
+    @Query({description:"Get an api key", action:"get"})
     getApiAsync(tenant: string, id: string) {
         this.requestContext.tenant = tenant;
         return <Promise<ApiKey>>super.getAsync(id);

@@ -14,9 +14,9 @@ export class RenewData {
 export class TokenHandler extends AbstractActionHandler implements ITokenService {
 
     private issuer:string;
-    // https://github.com/auth0/node-jsonwebtoken
+    // TODO https://github.com/auth0/node-jsonwebtoken
     // Certificate file (SHA 256)
-    private privateKey:Buffer;
+
     private secretKey:string;
     // https://github.com/rauchg/ms.js
     private tokenExpiration:string;
@@ -31,14 +31,9 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         this.issuer= process.env["VULCAIN_TOKEN_ISSUER"];
         this.tokenExpiration= process.env["VULCAIN_TOKEN_EXPIRATION"] || "20m";
         this.secretKey = process.env["VULCAIN_SECRET_KEY"] || "DnQBnCG7*fjEX@Rw5uN^hWR4*AkRVKMeRu2#Ucu^ECUNWrKr";
-        let privateKeyPath = process.env["VULCAIN_PRIVATE_KEY_PATH"];
-        if(privateKeyPath && fs.exists( privateKeyPath ))
-        {
-            this.privateKey = fs.readFileSync( privateKeyPath );
-        }
     }
 
-    @Action({action:"renewToken", inputSchema:"RenewData"})
+    @Action({description:"Renew a valid jwt token", action:"renewToken", inputSchema:"RenewData"})
     async renewTokenAsync(data: RenewData) : Promise<string>
     {
         let user = await this._users.getUserAsync( this.requestContext.tenant, this.requestContext.user.id );
@@ -63,7 +58,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         return result;
     }
 
-    @Action({action:"createToken"})
+    @Action({description:"Create a new jwt token", action:"createToken"})
     createTokenAsync( ) : Promise<string>
     {
         let ctx = this.requestContext;
@@ -113,7 +108,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
     private createToken(payload, options)
     {
         let token;
-        token = jwt.sign( payload, this.privateKey || this.secretKey, options );
+        token = jwt.sign( payload, this.secretKey, options );
         return token;
     }
 
@@ -130,7 +125,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
 
             try
             {
-                let key = this.privateKey || this.secretKey;
+                let key = this.secretKey;
                 //options.algorithms=[ALGORITHM];
 
                 jwt.verify( jwtToken, key, options, (err, payload) =>
