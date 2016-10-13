@@ -33,7 +33,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         this.secretKey = process.env["VULCAIN_SECRET_KEY"] || "DnQBnCG7*fjEX@Rw5uN^hWR4*AkRVKMeRu2#Ucu^ECUNWrKr";
     }
 
-    @Action({description:"Renew a valid jwt token", action:"renewToken", inputSchema:"RenewData"})
+    @Action({description:"Renew a valid jwt token", action:"renewToken", inputSchema:"RenewData", outputSchema:"string"})
     async renewTokenAsync(data: RenewData) : Promise<string>
     {
         let user = await this._users.getUserAsync( this.requestContext.tenant, this.requestContext.user.id );
@@ -58,7 +58,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         return result;
     }
 
-    @Action({description:"Create a new jwt token", action:"createToken"})
+    @Action({description:"Create a new jwt token", action:"createToken", outputSchema:"string"})
     createTokenAsync( ) : Promise<string>
     {
         let ctx = this.requestContext;

@@ -27,13 +27,12 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
         super(container);
     }
 
-    @Action({description:"Create an api key"})
-    createApiKey(data: ApiKey) {
+    createAsync(data: ApiKey) {
         data.tenant = data.tenant || this.requestContext.tenant;
         return super.createAsync(data);
     }
 
-    @Action({description:"Verify an api key"})
+    @Action({description:"Verify an api key", outputSchema:"boolean"})
     verifyTokenAsync( params: VerifyTokenParameter ) : Promise<boolean>
     {
         return new Promise( async ( resolve, reject ) =>
