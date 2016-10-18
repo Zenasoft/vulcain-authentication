@@ -11,7 +11,7 @@ WORKDIR /app
 RUN npm install && tsd install node express
 
 LABEL vulcain.serviceName=sovinty.identities.users-management
-LABEL vulcain.version=1.0.201
+LABEL vulcain.version=1.0.202
 
 COPY tsconfig.json package.json gulpFile.js /app/
 COPY src /app/src
