@@ -22,7 +22,7 @@ export class UsersAuthentication
         {
             try
             {
-                let tenant = req.headers["X_VULCAIN_TENANT"] || process.env[Conventions.instance.ENV_TENANT] || RequestContext.TestTenant;
+                let tenant = req.headers["X_VULCAIN_TENANT"] || process.env[Conventions.instance.ENV_VULCAIN_TENANT] || RequestContext.TestTenant;
 
                if(username==="admin" && password==="admin")
                {
