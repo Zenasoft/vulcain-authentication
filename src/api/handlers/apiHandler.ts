@@ -16,7 +16,7 @@ import {
 } from "vulcain-corejs";
 import {ApiKey} from "../models/apiKey";
 
-@ActionHandler({async:false, scope:"token-admin",  schema:"ApiKey", serviceName:DefaultServiceNames.ApiKeyService, eventMode: EventNotificationMode.never})
+@ActionHandler({async:false, scope:"token:admin",  schema:"ApiKey", serviceName:DefaultServiceNames.ApiKeyService, eventMode: EventNotificationMode.never})
 export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
 
     constructor(
@@ -55,7 +55,7 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
     }
 }
 
-@QueryHandler({scope:"token-admin", schema: ApiKey, serviceName: "QueryApiService"})
+@QueryHandler({scope:"token:admin", schema: ApiKey, serviceName: "QueryApiService"})
 class QueryApiService extends DefaultQueryHandler<ApiKey> implements IQueryApiService {
     @Query({description:"Get an api key", action:"get"})
     getApiAsync(tenant: string, id: string) {
