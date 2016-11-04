@@ -1,6 +1,6 @@
 {
   "name": "vulcain-users",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Vulcain user management",
   "main": "dist/index.js",
   "files": [

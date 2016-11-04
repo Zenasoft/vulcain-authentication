@@ -1,13 +1,13 @@
 import { VerifyTokenParameter } from 'vulcain-corejs';
-import {User} from './models/user';
-import {ApiKey} from './models/apiKey';
+import { User } from './models/user';
+import { ApiKey } from './models/apiKey';
 
 export interface IApiKeyService {
-    verifyTokenAsync(data:VerifyTokenParameter): Promise<boolean>;
+    verifyTokenAsync(data: VerifyTokenParameter): Promise<boolean>;
 }
 
 export interface ITokenService {
-    verifyTokenAsync(data:VerifyTokenParameter): Promise<boolean>;
+    verifyTokenAsync(data: VerifyTokenParameter): Promise<boolean>;
 }
 
 export interface IQueryUserService {
