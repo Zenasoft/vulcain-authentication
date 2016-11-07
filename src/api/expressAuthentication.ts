@@ -1,25 +1,28 @@
 
 var passport = require('passport');
 var BasicStrategy = require('passport-http').BasicStrategy;
-import { Conventions, RequestContext, AuthenticationStrategies, Inject } from "vulcain-corejs";
-import { IApiKeyService, ITokenService, IQueryUserService } from "./services";
+import { RequestContext, AuthenticationStrategies, Inject } from "vulcain-corejs";
+import { IApiKeyService, IQueryUserService } from "./services";
 
 export class UsersAuthentication {
-    constructor( @Inject("QueryUserService", true) users: IQueryUserService, @Inject("TokenService") tokens: ITokenService, @Inject("ApiKeyService", true) apiKeys: IApiKeyService) {
-        this.initBasic(users);
-        AuthenticationStrategies.initBearer(tokens);
-        AuthenticationStrategies.initApiKey(apiKeys);
+    constructor( @Inject("ApiKeyService", true) apiKeys: IApiKeyService) {
+        this.initBasic();
+        AuthenticationStrategies.initBearer();
+        if (apiKeys) {
+            AuthenticationStrategies.initApiKey();
+        }
         AuthenticationStrategies.initAnonymous();
     }
 
-    private initBasic(users: IQueryUserService) {
+    private initBasic() {
         let strategy = new BasicStrategy({ passReqToCallback: true }, async (req, username, password, callback) => {
             try {
-                let tenant = req.headers["X-VULCAIN-TENANT"] || process.env[Conventions.instance.ENV_VULCAIN_TENANT] || RequestContext.TestTenant;
+                let ctx = <RequestContext>req.requestContext;
+                let users = ctx.container.get<IQueryUserService>("QueryUserService");
 
                 if (username === "admin" && password === "admin") {
                     // Works only on bootstrap when there is no users yet
-                    let hasUsers = (users && await users.hasUsersAsync(tenant));
+                    let hasUsers = (users && await users.hasUsersAsync(ctx.tenant));
                     if (!hasUsers) {
                         return callback(null, { id: 0, name: "admin", displayName: "admin", scopes: "*" });
                     }
@@ -28,10 +31,11 @@ export class UsersAuthentication {
                 if (!users) {
                     return callback(null, false);
                 }
-                let user = await users.getUserByNameAsync(tenant, username);
+
+                let user = await users.getUserByNameAsync(ctx.tenant, username);
                 // No user found with that username
                 if (!user || user.disabled) {
-                    console.log("LOGIN: invalid user name " + username + " for tenant " + tenant);
+                    console.log("LOGIN: invalid user name " + username + " for tenant " + ctx.tenant);
                     return callback(null, false);
                 }
 

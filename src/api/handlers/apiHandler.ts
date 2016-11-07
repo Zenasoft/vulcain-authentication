@@ -17,10 +17,7 @@ import { ApiKey } from "../models/apiKey";
 @ActionHandler({ async: false, scope: "token:admin", schema: "ApiKey", serviceName: DefaultServiceNames.ApiKeyService, eventMode: EventNotificationMode.never })
 export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
 
-    constructor(
-        @Inject("Container") container: IContainer,
-        @Inject("QueryApiService") private apis: IQueryApiService
-    ) {
+    constructor(@Inject("Container") container: IContainer) {
         super(container);
     }
 
@@ -33,7 +30,8 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
     verifyTokenAsync(params: VerifyTokenParameter): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                let token = await this.apis.getApiAsync(params.tenant, params.apiKey);
+                let apis = this.container.get<IQueryApiService>("QueryApiService");
+                let token = await apis.getApiAsync(params.tenant, params.apiKey);
                 if (token) {
                     resolve({ token: token, user: { name: token.userName, id: token.userId, tenant: token.tenant, data: token.data } });
                     return;

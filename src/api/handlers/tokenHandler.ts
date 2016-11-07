@@ -22,7 +22,6 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
 
     constructor(
         @Inject("Domain") domain,
-        @Inject("QueryUserService", true) private _users: IQueryUserService,
         @Inject("Container") container: IContainer
     ) {
         super(container);
@@ -33,7 +32,8 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
 
     @Action({ description: "Renew a valid jwt token", action: "renewToken", inputSchema: "RenewData", outputSchema: "string" })
     async renewTokenAsync(data: RenewData): Promise<string> {
-        let user = await this._users.getUserAsync(this.requestContext.tenant, this.requestContext.user.id);
+        let users = this.container.get<IQueryUserService>("QueryUserService");
+        let user = await users.getUserAsync(this.requestContext.tenant, this.requestContext.user.id);
         // No user found with that username
         if (!user || user.disabled) {
             throw new Error("Invalid user");
@@ -118,7 +118,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
                     }
                     else {
                         const token = payload.value;
-                        if (token.tenant !== this.requestContext.tenant) {
+                        if (token.user.tenant !== this.requestContext.tenant) {
                             reject({ message: "Invalid tenant" });
                         }
                         else {
