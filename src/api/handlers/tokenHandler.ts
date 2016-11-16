@@ -1,7 +1,5 @@
 import { ITokenService, IQueryUserService } from "../services";
-import { VerifyTokenParameter, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode } from "vulcain-corejs";
-var jwt = require('jsonwebtoken');
-var ms = require('ms');
+import { VerifyTokenParameter, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode, DefaultServiceNames } from 'vulcain-corejs';
 
 @Model()
 export class RenewData {
@@ -9,7 +7,7 @@ export class RenewData {
     renewToken: string;
 }
 
-@ActionHandler({ async: false, scope: "*", serviceName: "TokenService", eventMode: EventNotificationMode.never })
+@ActionHandler({ async: false, scope: "*", eventMode: EventNotificationMode.never })
 export class TokenHandler extends AbstractActionHandler implements ITokenService {
 
     private issuer: string;
@@ -40,7 +38,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         }
 
         try {
-            await this.verifyTokenAsync({ apiKey: data.renewToken, tenant: this.requestContext.tenant });
+            await this.verifyTokenAsync({ token: data.renewToken, tenant: this.requestContext.tenant });
         }
         catch (e) {
             throw new Error("Invalid renew token");
@@ -55,81 +53,12 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
     @Action({ description: "Create a new jwt token", action: "createToken", outputSchema: "string" })
     createTokenAsync(): Promise<string> {
         let ctx = this.requestContext;
-
-        return new Promise(async (resolve, reject) => {
-            const payload = {
-                value:
-                {
-                    user: {
-                        displayName: ctx.user.displayName,
-                        id: ctx.user.id,
-                        email: ctx.user.email,
-                        name: ctx.user.name,
-                        tenant: this.requestContext.tenant
-                    },
-                    scopes: ctx.user.scopes
-                }
-            };
-
-            let options = { issuer: this.issuer, expiresIn: this.tokenExpiration };
-
-            try {
-                let jwtToken = this.createToken(payload, options);
-                let renewToken = this.createToken({}, options);
-
-                let expiresIn;
-                if (typeof this.tokenExpiration === 'string') {
-                    const milliseconds = ms(this.tokenExpiration);
-                    expiresIn = Math.floor(milliseconds / 1000);
-                }
-                else {
-                    expiresIn = this.tokenExpiration;
-                }
-                // token payload contains iat (absolute expiration date in sec)
-                resolve({ expiresIn, token: jwtToken, renewToken: renewToken });
-            }
-            catch (err) {
-                reject({ error: err, message: "Error when creating new token for user :" + ctx.user.name + " - " + (err.message || err) });
-            }
-        });
+        let tokens = this.container.get<ITokenService>(DefaultServiceNames.TokenService);
+        return tokens.createTokenAsync(ctx.user);
     }
 
-    private createToken(payload, options) {
-        let token;
-        token = jwt.sign(payload, this.secretKey, options);
-        return token;
-    }
-
-    verifyTokenAsync(jwtToken: VerifyTokenParameter): Promise<any> {
-        return new Promise(async (resolve, reject) => {
-            if (!jwtToken) {
-                reject("You must provided a valid token");
-                return;
-            }
-            let options: any = { "issuer": this.issuer };
-
-            try {
-                let key = this.secretKey;
-                //options.algorithms=[ALGORITHM];
-
-                jwt.verify(jwtToken, key, options, (err, payload) => {
-                    if (err) {
-                        reject(err);
-                    }
-                    else {
-                        const token = payload.value;
-                        if (token.user.tenant !== this.requestContext.tenant) {
-                            reject({ message: "Invalid tenant" });
-                        }
-                        else {
-                            resolve(token);
-                        }
-                    }
-                });
-            }
-            catch (err) {
-                reject({ error: err, message: "Invalid JWT token" });
-            }
-        });
+    verifyTokenAsync(p: VerifyTokenParameter): Promise<any> {
+        let tokens = this.container.get<ITokenService>(DefaultServiceNames.TokenService);
+        return tokens.verifyTokenAsync(p);
     }
 }

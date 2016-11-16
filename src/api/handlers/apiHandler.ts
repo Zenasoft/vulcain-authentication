@@ -31,7 +31,7 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
         return new Promise(async (resolve, reject) => {
             try {
                 let apis = this.container.get<IQueryApiService>("QueryApiService");
-                let token = await apis.getApiAsync(params.tenant, params.apiKey);
+                let token = await apis.getApiAsync(params.tenant, params.token);
                 if (token) {
                     resolve({ token: token, user: { name: token.userName, id: token.userId, tenant: token.tenant, data: token.data } });
                     return;
