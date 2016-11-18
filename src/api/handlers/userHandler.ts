@@ -13,9 +13,12 @@ export class UserHandler extends DefaultActionHandler {
 @QueryHandler({ scope: "user:admin", schema: User, serviceName: "QueryUserService" })
 class QueryUserService extends DefaultQueryHandler<User> {
 
-    async getUserAsync(tenant: string, name: string) {
-        this.requestContext.tenant = tenant;
-        return super.getAsync(name);
+    async getAsync(name: string) {
+        let user = await super.getAsync(name);
+        if (user) {
+            user.password = undefined;
+        }
+        return user;
     }
 
     async getUserByNameAsync(tenant: string, name: string) {
