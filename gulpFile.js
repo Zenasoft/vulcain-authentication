@@ -31,7 +31,6 @@ gulp.task("compile-test", ['compile-ts'], function () {
     var tsProject = ts.createProject(
         './tsconfig.json',
         {
-            sortOutput: true,
             typescript: require('typescript')    // must be a project package dependency
         });
 
@@ -40,7 +39,7 @@ gulp.task("compile-test", ['compile-ts'], function () {
         "./typings/index.d.ts"
     ], { base: 'test/' })
         .pipe(sourcemaps.init())
-        .pipe(ts(tsProject));
+        .pipe(tsProject());
 
     return tsResult.js
         .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: rootDir + "/test" }))
@@ -77,7 +76,6 @@ gulp.task("compile-ts", ['tslint', 'clean'], function () {
     var tsProject = ts.createProject(
         './tsconfig.json',
         {
-            sortOutput: true,
             typescript: require('typescript')    // must be a project package dependency
         });
 
@@ -86,7 +84,7 @@ gulp.task("compile-ts", ['tslint', 'clean'], function () {
         "./typings/index.d.ts"
     ])
         .pipe(sourcemaps.init())
-        .pipe(ts(tsProject));
+        .pipe(tsProject());
 
     return merge([
         tsResult.dts

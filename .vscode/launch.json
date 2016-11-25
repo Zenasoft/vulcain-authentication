@@ -13,7 +13,6 @@
 			"cwd": "${workspaceRoot}",
 			"runtimeExecutable": null,
 			"runtimeArgs": [
-				"--harmony"
 			],
 			"env": {
 				"VULCAIN_STORAGE": "master1",
@@ -22,7 +21,7 @@
 				"VULCAIN_SERVICE_NAME": "sovinty.identities.users-management",
 				"NODE_ENV": "development"
 			},
-			"externalConsole": false,
+			"console": "internalConsole",
 			"sourceMaps": true,
 			"outDir": "${workspaceRoot}/dist"
 		},
@@ -43,7 +42,7 @@
             "env": {
 				"VULCAIN_STORAGE": "master1",
 				"VULCAIN_CLUSTER": "vulcain",
-				"VULCAIN_SERVICE_NAME": "SAMPLE",				
+				"VULCAIN_SERVICE_NAME": "SAMPLE",
                 "NODE_ENV": "test"
             },
             "externalConsole": false,
