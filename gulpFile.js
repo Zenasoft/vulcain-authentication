@@ -72,7 +72,6 @@ function incrementVersion() {
 
 // https://www.npmjs.com/package/gulp-typescript
 gulp.task("compile-ts", ['tslint', 'clean'], function () {
-    incrementVersion();
     var tsProject = ts.createProject(
         './tsconfig.json',
         {

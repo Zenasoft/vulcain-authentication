@@ -1,7 +1,7 @@
 
 var passport = require('passport');
 var BasicStrategy = require('passport-http').BasicStrategy;
-import { RequestContext, AuthenticationStrategies, Inject } from "vulcain-corejs";
+import { System, RequestContext, AuthenticationStrategies, Inject } from "vulcain-corejs";
 import { IApiKeyService, IQueryUserService } from "./services";
 
 export class UsersAuthentication {
@@ -16,14 +16,16 @@ export class UsersAuthentication {
 
     private initBasic() {
         let strategy = new BasicStrategy({ passReqToCallback: true }, async (req, username, password, callback) => {
+            let ctx = <RequestContext>req.requestContext;
+
             try {
-                let ctx = <RequestContext>req.requestContext;
                 let users = ctx.container.get<IQueryUserService>("QueryUserService");
 
                 if (username === "admin" && password === "admin") {
                     // Works only on bootstrap when there is no users yet
                     let hasUsers = (users && await users.hasUsersAsync(ctx.tenant));
                     if (!hasUsers) {
+                        System.log.info(ctx, `User authentication: Connected with default admin profile`);
                         return callback(null, { id: 0, name: "admin", displayName: "admin", scopes: "*" });
                     }
                 }
@@ -35,7 +37,7 @@ export class UsersAuthentication {
                 let user = await users.getUserByNameAsync(ctx.tenant, username);
                 // No user found with that username
                 if (!user || user.disabled) {
-                    console.log("LOGIN: invalid user name " + username + " for tenant " + ctx.tenant);
+                    System.log.info(ctx, `User authentication: Invalid profile ${username} tenant ${ctx.tenant}`);
                     return callback(null, false);
                 }
 
@@ -44,6 +46,7 @@ export class UsersAuthentication {
 
                 // Password did not match
                 if (!isMatch) {
+                    System.log.info(ctx, `User authentication: Invalid password for ${username} tenant ${ctx.tenant}`);
                     return callback(null, false);
                 }
 
@@ -51,6 +54,7 @@ export class UsersAuthentication {
                 return callback(null, user);
             }
             catch (err) {
+                System.log.error(ctx, err, `User authentication: Error for profile ${username} tenant ${ctx.tenant}`);
                 return callback(err, false);
             }
         });
