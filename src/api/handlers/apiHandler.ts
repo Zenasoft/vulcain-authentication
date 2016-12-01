@@ -39,7 +39,7 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
                 reject({ message: "Invalid api key" });
             }
             catch (err) {
-                reject({ error: err, message: "Invalid api key" });
+                reject(err);
             }
         });
     }
