@@ -7,5 +7,5 @@ export { ApiKey } from './api/models/apiKey';
 export function useUserManagement(container: IContainer) {
     let path = Path.dirname(module.filename);
     container.injectFrom(Path.join(path, 'api/handlers'));
-    container.injectScoped(UsersAuthentication, DefaultServiceNames.Authentication);
+    container.injectSingleton(UsersAuthentication, DefaultServiceNames.Authentication);
 }
