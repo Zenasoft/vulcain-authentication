@@ -13,7 +13,6 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
     private issuer: string;
     // TODO https://github.com/auth0/node-jsonwebtoken
     // Certificate file (SHA 256)
-
     private secretKey: string;
     // https://github.com/rauchg/ms.js
     private tokenExpiration: string;
