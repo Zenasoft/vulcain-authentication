@@ -13,7 +13,6 @@ export interface ITokenService {
 
 export interface IQueryUserService {
     getUserByNameAsync(tenant: string, name: string): Promise<User>;
-    getUserAsync(tenant: string, id: string): Promise<User>;
     verifyPassword(original, pwd): boolean;
     hasUsersAsync(tenant: string): Promise<boolean>;
 }

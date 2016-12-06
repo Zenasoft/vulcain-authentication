@@ -1,5 +1,6 @@
 import { QueryHandler, ActionHandler, DefaultActionHandler, DefaultQueryHandler } from "vulcain-corejs";
 import { User } from "../models/user";
+import { IQueryUserService } from '../../api/services';
 
 @ActionHandler({ async: false, scope: "user:admin", schema: "User", serviceName: "UserService" })
 export class UserHandler extends DefaultActionHandler {
@@ -11,7 +12,7 @@ export class UserHandler extends DefaultActionHandler {
 }
 
 @QueryHandler({ scope: "user:admin", schema: User, serviceName: "QueryUserService" })
-class QueryUserService extends DefaultQueryHandler<User> {
+class QueryUserService extends DefaultQueryHandler<User> implements IQueryUserService {
 
     async getAsync(name: string) {
         let user = await super.getAsync(name);
@@ -22,16 +23,27 @@ class QueryUserService extends DefaultQueryHandler<User> {
     }
 
     async getUserByNameAsync(tenant: string, name: string) {
-        this.requestContext.tenant = tenant;
-        let list = await super.getAllAsync({ name: name }, 2);
-        return list && list.length === 1 ? list[0] : null;
+        let t = this.requestContext.tenant;
+        try {
+            this.requestContext.tenant = tenant;
+            let list = await super.getAllAsync({ name: name }, 2);
+            return list && list.length === 1 ? list[0] : null;
+        }
+        finally {
+            this.requestContext.tenant = t;
+        }
     }
 
     async hasUsersAsync(tenant: string): Promise<boolean> {
-        this.requestContext.tenant = tenant;
-
-        let list = await super.getAllAsync({}, 1);
-        return list && list.length > 0;
+        let t = this.requestContext.tenant;
+        try {
+            this.requestContext.tenant = tenant;
+            let list = await super.getAllAsync({}, 1);
+            return list && list.length > 0;
+        }
+        finally {
+            this.requestContext.tenant = t;
+        }
     }
 
     verifyPassword(hash, plain) {

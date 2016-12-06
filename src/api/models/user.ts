@@ -12,7 +12,7 @@ export class User {
     id: string;
     @Property({ type: "string", unique: true, required: true })
     name: string;
-    @Property({ type: "string", required: false })
+    @Property({ type: "string", required: false})
     password: string;
     @Property({ type: "string", required: true })
     displayName: string;

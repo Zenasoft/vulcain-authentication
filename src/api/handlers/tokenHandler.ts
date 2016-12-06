@@ -30,7 +30,7 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
     @Action({ description: "Renew a valid jwt token", action: "renewToken", inputSchema: "RenewData", outputSchema: "string" })
     async renewTokenAsync(data: RenewData): Promise<string> {
         let users = this.container.get<IQueryUserService>("QueryUserService");
-        let user = await users.getUserAsync(this.requestContext.tenant, this.requestContext.user.id);
+        let user = await users.getUserByNameAsync(this.requestContext.tenant, this.requestContext.user.id);
         // No user found with that username
         if (!user || user.disabled) {
             throw new Error("Invalid user");
