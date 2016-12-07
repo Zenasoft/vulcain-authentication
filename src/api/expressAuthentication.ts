@@ -1,9 +1,14 @@
-import { System, RequestContext, AuthenticationStrategies, Inject } from "vulcain-corejs";
+import { ExpressAuthentication, System, RequestContext, Inject } from "vulcain-corejs";
 import { IApiKeyService, IQueryUserService } from "./services";
 
-export class UsersAuthentication {
+export class UsersAuthentication extends ExpressAuthentication {
 
-    static async userStrategy(ctx: RequestContext, token: string) {
+    constructor() {
+        super();
+        this.addOrReplaceStrategy("basic", this.basicAuthentication);
+    }
+
+    private async basicAuthentication(ctx: RequestContext, token: string) {
         let username: string;
         let password: string;
         try {
