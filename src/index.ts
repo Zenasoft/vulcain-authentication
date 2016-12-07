@@ -8,5 +8,5 @@ export function useUserManagement(container: IContainer) {
     let path = Path.dirname(module.filename);
     container.injectFrom(Path.join(path, 'api/handlers'));
     // Replace existing service
-    container.injectSingleton(DefaultServiceNames.Authentication, UsersAuthentication);
+    container.injectSingleton(UsersAuthentication, DefaultServiceNames.Authentication);
 }
