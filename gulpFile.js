@@ -13,7 +13,6 @@ var gulp = require("gulp"),
     tslint = require("gulp-tslint");
 
 // Base root directory for source map
-var rootDir = "file://" + __dirname;
 process.on('uncaughtException', console.error.bind(console));
 
 gulp.task('default', ['compile-ts']);
@@ -35,14 +34,13 @@ gulp.task("compile-test", ['compile-ts'], function () {
         });
 
     var tsResult = gulp.src([
-        "./test/**/*.ts",
-        "./typings/index.d.ts"
+        "./test/**/*.ts"
     ], { base: 'test/' })
         .pipe(sourcemaps.init())
         .pipe(tsProject());
 
     return tsResult.js
-        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: rootDir + "/test" }))
+        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: "../test" }))
         .pipe(gulp.dest("dist-test/"));
 });
 
@@ -79,8 +77,7 @@ gulp.task("compile-ts", ['tslint', 'clean'], function () {
         });
 
     var tsResult = gulp.src([
-        "./src/**/*.ts",
-        "./typings/index.d.ts"
+        "./src/**/*.ts"
     ])
         .pipe(sourcemaps.init())
         .pipe(tsProject());
@@ -89,7 +86,7 @@ gulp.task("compile-ts", ['tslint', 'clean'], function () {
         tsResult.dts
             .pipe(gulp.dest('dist')),
         tsResult.js
-            .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: rootDir + "/src" }))
+            .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: "." }))
             .pipe(gulp.dest('dist'))
     ]
     );
