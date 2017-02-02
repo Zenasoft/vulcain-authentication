@@ -24,7 +24,7 @@ export class UsersAuthentication extends ExpressAuthentication {
                 let hasUsers = (users && await users.hasUsersAsync(ctx.tenant));
                 if (!hasUsers) {
                     System.log.info(ctx, `User authentication: Connected with default admin profile`);
-                    return { id: 0, name: "admin", displayName: "admin", scopes: "*" };
+                    return { id: 0, name: "admin", displayName: "admin", scopes: ["*"] };
                 }
             }
 

@@ -1,6 +1,6 @@
 {
   "name": "vulcain-users",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "Vulcain user management",
   "main": "dist/index.js",
   "files": [
@@ -42,6 +42,6 @@
     "reflect-metadata": "^0.1.0",
     "rx": "^4.1.0",
     "unirest": "^0.5.0",
-    "vulcain-corejs": "^1.1.85"
+    "vulcain-corejs": "^1.1.107"
   }
 }
