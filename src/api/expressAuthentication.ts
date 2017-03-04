@@ -13,9 +13,14 @@ export class UsersAuthentication extends ExpressAuthentication {
         let password: string;
         try {
             let users = ctx.container.get<IQueryUserService>("QueryUserService");
-            let credentials = new Buffer(token, 'base64').toString().split(':');
-            username = credentials[0];
-            password = credentials[1];
+            let credentials = new Buffer(token, 'base64').toString();
+            if (credentials) {
+                const pos = credentials.indexOf(':');
+                if (pos >= 0) {
+                    username = credentials.substr(0, pos);
+                    password = credentials.substr(pos + 1);
+                }
+            }
             if (!username || !password) {
                 return null;
             }
