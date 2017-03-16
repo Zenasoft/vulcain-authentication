@@ -11,7 +11,7 @@ export class UserHandler extends DefaultActionHandler {
     }
 }
 
-@QueryHandler({ scope: "user:admin", schema: User, serviceName: "QueryUserService" })
+@QueryHandler({ scope: "user:admin", schema: "User", serviceName: "QueryUserService" })
 class QueryUserService extends DefaultQueryHandler<User> implements IQueryUserService {
 
     async getAsync(name: string) {

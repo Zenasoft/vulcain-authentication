@@ -3,18 +3,22 @@ import * as crypto from 'crypto';
 
 const saltSize = 32;
 
+export interface IUser {
+    name: string;
+    displayName: string;
+    password: string;
+    scopes: string[];
+}
+
 @Model({
-    bind: User.bind,
     storageName: "users"
 })
-export class User {
-    @Property({ type: "uid", isKey: true })
-    id: string;
-    @Property({ type: "string", unique: true, required: true })
+export class User implements IUser {
+    @Property({ type: "string", isKey: true, unique: true, required: true })
     name: string;
-    @Property({ type: "string", required: false})
+    @Property({ type: "string", required: false })
     password: string;
-    @Property({ type: "string", required: true })
+    @Property({type: "string", required: true, bind: User.bind})
     displayName: string;
     @Property({ type: "string" })
     email: string;
@@ -25,11 +29,8 @@ export class User {
     @Property({ type: "boolean" })
     disabled: boolean;
 
-    static bind(user: User) {
-        if (user.password) {
-            user.password = User.encryptPassword(user.password);
-        }
-        return user;
+    static bind(password: string) {
+        return password && User.encryptPassword(password);
     }
 
     static encryptPassword(plainText: string, salt?) {

@@ -45,7 +45,7 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
     }
 }
 
-@QueryHandler({ scope: "token:admin", schema: ApiKey, serviceName: "QueryApiService" })
+@QueryHandler({ scope: "token:admin", schema: "ApiKey", serviceName: "QueryApiService" })
 class QueryApiService extends DefaultQueryHandler<ApiKey> implements IQueryApiService {
     @Query({ description: "Get an api key", action: "get" })
     getApiAsync(tenant: string, id: string) {

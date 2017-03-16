@@ -1,7 +1,7 @@
 import { DefaultServiceNames, IContainer } from 'vulcain-corejs';
 import { UsersAuthentication } from './api/expressAuthentication';
 import * as Path from 'path';
-export { User } from './api/models/user';
+export { User, IUser } from './api/models/user';
 export { ApiKey } from './api/models/apiKey';
 
 export function useUserManagement(container: IContainer) {
