@@ -14,24 +14,18 @@ export interface IUser {
     storageName: "users"
 })
 export class User implements IUser {
-    @Property({ type: "string", isKey: true, unique: true, required: true })
+    @Property({ isKey: true, unique: true, required: true })
     name: string;
-    @Property({ type: "string", required: false })
+    @Property({ required: false, bind: pwd => pwd && User.encryptPassword(pwd) })
     password: string;
-    @Property({type: "string", required: true, bind: User.bind})
+    @Property({required: true, bind: (v, e) => v || e.name})
     displayName: string;
     @Property({ type: "string" })
     email: string;
-    @Property({ type: "arrayOf", item: "string" })
+    @Property({ type: "arrayOf", items: "string", required: true })
     scopes: Array<string>;
     @Reference({ item: "any", cardinality: "one" })
-    data: any;
-    @Property({ type: "boolean" })
     disabled: boolean;
-
-    static bind(password: string) {
-        return password && User.encryptPassword(password);
-    }
 
     static encryptPassword(plainText: string, salt?) {
         salt = salt && new Buffer(salt, 'hex') || crypto.randomBytes(saltSize);

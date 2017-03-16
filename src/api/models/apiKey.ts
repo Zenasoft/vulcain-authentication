@@ -4,7 +4,7 @@ import { Property, Model, Reference } from 'vulcain-corejs';
 export class ApiKey {
     @Property({ type: "uid", required: false, isKey: true })
     token: string;
-    @Property({ type: "arrayOf", item: "string", required: true })
+    @Property({ type: "arrayOf", items: "string", required: true })
     scopes: Array<string>;
     @Property({ type: "string", required: true })
     description: string;

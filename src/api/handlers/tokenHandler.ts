@@ -1,5 +1,5 @@
 import { ITokenService, IQueryUserService } from "../services";
-import { VerifyTokenParameter, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode, DefaultServiceNames } from 'vulcain-corejs';
+import { VerifyTokenParameter, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode, DefaultServiceNames, ConfigurationProperty, Conventions, System } from 'vulcain-corejs';
 
 @Model()
 export class RenewData {
@@ -7,6 +7,9 @@ export class RenewData {
     renewToken: string;
 }
 
+@ConfigurationProperty(Conventions.instance.TOKEN_ISSUER, "string")
+@ConfigurationProperty(Conventions.instance.TOKEN_EXPIRATION, "string")
+@ConfigurationProperty(Conventions.instance.VULCAIN_SECRET_KEY, "string")
 @ActionHandler({ async: false, scope: "*", eventMode: EventNotificationMode.never })
 export class TokenHandler extends AbstractActionHandler implements ITokenService {
 
@@ -22,9 +25,9 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         @Inject("Container") container: IContainer
     ) {
         super(container);
-        this.issuer = process.env["VULCAIN_TOKEN_ISSUER"];
-        this.tokenExpiration = process.env["VULCAIN_TOKEN_EXPIRATION"] || "20m";
-        this.secretKey = process.env["VULCAIN_SECRET_KEY"] || "DnQBnCG7*fjEX@Rw5uN^hWR4*AkRVKMeRu2#Ucu^ECUNWrKr";
+        this.issuer = System.createSharedConfigurationProperty<string>( Conventions.instance.TOKEN_ISSUER ).value;
+        this.tokenExpiration = System.createSharedConfigurationProperty<string>(Conventions.instance.TOKEN_EXPIRATION, Conventions.instance.defaultTokenExpiration).value;
+        this.secretKey = System.createSharedConfigurationProperty<string>(Conventions.instance.VULCAIN_SECRET_KEY, Conventions.instance.defaultSecretKey).value;
     }
 
     @Action({ description: "Renew a valid jwt token", action: "renewToken", inputSchema: "RenewData", outputSchema: "string" })
