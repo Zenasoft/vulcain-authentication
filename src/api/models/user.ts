@@ -14,11 +14,11 @@ export interface IUser {
     storageName: "users"
 })
 export class User implements IUser {
-    @Property({ isKey: true, unique: true, required: true })
+    @Property({ type:'string', isKey: true, unique: true, required: true })
     name: string;
-    @Property({ required: false, bind: pwd => pwd && User.encryptPassword(pwd) })
+    @Property({ type:'string',  required: false, bind: pwd => pwd && User.encryptPassword(pwd) })
     password: string;
-    @Property({required: true, bind: (v, e) => v || e.name})
+    @Property({ type:'string', required: true, bind: (v, e) => v || e.name})
     displayName: string;
     @Property({ type: "string" })
     email: string;
