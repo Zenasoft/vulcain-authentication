@@ -1,6 +1,7 @@
 import { QueryHandler, ActionHandler, DefaultActionHandler, DefaultQueryHandler } from "vulcain-corejs";
 import { User } from "../models/user";
 import { IQueryUserService } from '../../api/services';
+import sanitize from 'mongo-sanitize';
 
 @ActionHandler({ async: false, scope: "user:admin", schema: "User", serviceName: "UserService" })
 export class UserHandler extends DefaultActionHandler {
@@ -15,7 +16,8 @@ export class UserHandler extends DefaultActionHandler {
 class QueryUserService extends DefaultQueryHandler<User> implements IQueryUserService {
 
     async getAsync(name: string) {
-        let user = await super.getAsync(name);
+
+        let user = await super.getAsync(sanitize(name));
         if (user) {
             user.password = undefined;
         }
@@ -26,7 +28,7 @@ class QueryUserService extends DefaultQueryHandler<User> implements IQueryUserSe
         let t = this.requestContext.tenant;
         try {
             this.requestContext.tenant = tenant;
-            let list = await super.getAllAsync({ name: name }, 2);
+            let list = await super.getAllAsync({ name: sanitize(name) }, 2);
             return list && list.length === 1 ? list[0] : null;
         }
         finally {

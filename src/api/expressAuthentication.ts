@@ -28,7 +28,7 @@ export class UsersAuthentication extends ExpressAuthentication {
                 // Works only on bootstrap when there is no users yet
                 let hasUsers = (users && await users.hasUsersAsync(ctx.tenant));
                 if (!hasUsers) {
-                    System.log.info(ctx, `User authentication: Connected with default admin profile`);
+                    System.log.info(ctx, ()=> `User authentication: Connected with default admin profile`);
                     return { id: 0, name: "admin", displayName: "admin", scopes: ["*"] };
                 }
             }
@@ -40,7 +40,7 @@ export class UsersAuthentication extends ExpressAuthentication {
             let user = await users.getUserByNameAsync(ctx.tenant, username);
             // No user found with that username
             if (!user || user.disabled) {
-                System.log.info(ctx, `User authentication: Invalid profile ${username} tenant ${ctx.tenant}`);
+                System.log.info(ctx, ()=>`User authentication: Invalid profile ${username} tenant ${ctx.tenant}`);
                 return null;
             }
 
@@ -49,15 +49,15 @@ export class UsersAuthentication extends ExpressAuthentication {
 
             // Password did not match
             if (!isMatch) {
-                System.log.info(ctx, `User authentication: Invalid password for ${username} tenant ${ctx.tenant}`);
+                System.log.info(ctx, ()=>`User authentication: Invalid password for ${username} tenant ${ctx.tenant}`);
                 return null;
             }
 
             // Success
-            return user;
+            return <any>user;
         }
         catch (err) {
-            System.log.error(ctx, err, `User authentication: Error for profile ${username} tenant ${ctx.tenant}`);
+            System.log.error(ctx, err, ()=>`User authentication: Error for profile ${username} tenant ${ctx.tenant}`);
             return null;
         }
     }

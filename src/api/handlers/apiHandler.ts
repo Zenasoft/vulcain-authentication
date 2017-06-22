@@ -13,6 +13,7 @@ import {
     DefaultServiceNames
 } from "vulcain-corejs";
 import { ApiKey } from "../models/apiKey";
+import sanitize from 'mongo-sanitize';
 
 @ActionHandler({ async: false, scope: "token:admin", schema: "ApiKey", serviceName: DefaultServiceNames.ApiKeyService, eventMode: EventNotificationMode.never })
 export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
@@ -50,6 +51,6 @@ class QueryApiService extends DefaultQueryHandler<ApiKey> implements IQueryApiSe
     @Query({ description: "Get an api key", action: "get" })
     getApiAsync(tenant: string, id: string) {
         this.requestContext.tenant = tenant;
-        return <Promise<ApiKey>>super.getAsync(id);
+        return <Promise<ApiKey>>super.getAsync(sanitize(id));
     }
 }
