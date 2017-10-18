@@ -5,25 +5,22 @@
 			"name": "Debug",
 			"type": "node",
 			"request": "launch",
-			"smartStep": true,
+			"smartStep": false,
 			"program": "${workspaceRoot}/src/index.ts",
 			"stopOnEntry": false,
 			"preLaunchTask": "compile-ts",
 			"args": [],
-			"cwd": "${workspaceRoot}",
 			"runtimeExecutable": null,
 			"runtimeArgs": [
 			],
 			"env": {
-				"VULCAIN_STORAGE": "master1",
-				"VULCAIN_CLUSTER": "test",
 				"VULCAIN_SERVICE_VERSION" : "1.0",
-				"VULCAIN_SERVICE_NAME": "sovinty.identities.users-management",
+				"VULCAIN_SERVICE_NAME": "vulcain.identities.users-management",
 				"NODE_ENV": "development"
 			},
 			"console": "internalConsole",
 			"sourceMaps": true,
-			"outDir": "${workspaceRoot}/dist"
+			"outFiles": ["${workspaceRoot}/dist/**/*.js"]
 		},
         {
             "name": "Test",
@@ -40,14 +37,13 @@
                 "--harmony"
             ],
             "env": {
-				"VULCAIN_STORAGE": "master1",
 				"VULCAIN_CLUSTER": "vulcain",
 				"VULCAIN_SERVICE_NAME": "SAMPLE",
                 "NODE_ENV": "test"
             },
-            "externalConsole": false,
+            "console": "internalConsole",
             "sourceMaps": true,
-            "outDir": "${workspaceRoot}/dist-test"
+            "outFiles": ["${workspaceRoot}/dist-test/**/*.js", "${workspaceRoot}/dist/**/*.js"]
         },
 		{
 			"name": "Attach",

@@ -1,5 +1,6 @@
-import { ITokenService, IQueryUserService } from "../services";
-import { VerifyTokenParameter, Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IContainer, EventNotificationMode, DefaultServiceNames, ConfigurationProperty, Conventions, System } from 'vulcain-corejs';
+import { Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IAuthenticationStrategy, IContainer, EventNotificationMode, DefaultServiceNames, ConfigurationProperty, Conventions, System, DynamicConfiguration } from 'vulcain-corejs';
+import { QueryUserService } from './userHandler';
+import { VerifyTokenParameter } from './verifyTokenParameter';
 
 @Model()
 export class RenewData {
@@ -7,16 +8,16 @@ export class RenewData {
     renewToken: string;
 }
 
-@ConfigurationProperty(Conventions.instance.TOKEN_ISSUER, "string")
-@ConfigurationProperty(Conventions.instance.TOKEN_EXPIRATION, "string")
-@ConfigurationProperty(Conventions.instance.VULCAIN_SECRET_KEY, "string")
 @ActionHandler({ async: false, scope: "*", eventMode: EventNotificationMode.never })
-export class TokenHandler extends AbstractActionHandler implements ITokenService {
+export class TokenHandler extends AbstractActionHandler {
 
+    @ConfigurationProperty(Conventions.instance.TOKEN_ISSUER, "string")
     private issuer: string;
     // TODO https://github.com/auth0/node-jsonwebtoken
     // Certificate file (SHA 256)
+    @ConfigurationProperty(Conventions.instance.VULCAIN_SECRET_KEY, "string")
     private secretKey: string;
+    @ConfigurationProperty(Conventions.instance.TOKEN_EXPIRATION, "string")
     // https://github.com/rauchg/ms.js
     private tokenExpiration: string;
 
@@ -25,22 +26,23 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
         @Inject("Container") container: IContainer
     ) {
         super(container);
-        this.issuer = System.createSharedConfigurationProperty<string>( Conventions.instance.TOKEN_ISSUER ).value;
-        this.tokenExpiration = System.createSharedConfigurationProperty<string>(Conventions.instance.TOKEN_EXPIRATION, Conventions.instance.defaultTokenExpiration).value;
-        this.secretKey = System.createSharedConfigurationProperty<string>(Conventions.instance.VULCAIN_SECRET_KEY, Conventions.instance.defaultSecretKey).value;
+        this.issuer = DynamicConfiguration.getChainedConfigurationProperty<string>( Conventions.instance.TOKEN_ISSUER ).value;
+        this.tokenExpiration = DynamicConfiguration.getChainedConfigurationProperty<string>(Conventions.instance.TOKEN_EXPIRATION, Conventions.instance.defaultTokenExpiration).value;
+        this.secretKey = DynamicConfiguration.getChainedConfigurationProperty<string>(Conventions.instance.VULCAIN_SECRET_KEY, Conventions.instance.defaultSecretKey).value;
     }
 
     @Action({ description: "Renew a valid jwt token", action: "renewToken", inputSchema: "RenewData", outputSchema: "string" })
-    async renewTokenAsync(data: RenewData): Promise<string> {
-        let users = this.container.get<IQueryUserService>("QueryUserService");
-        let user = await users.getUserByNameAsync(this.requestContext.tenant, this.requestContext.user.name);
+    async renewTokenAsync(data: RenewData): Promise<{ expiresIn: number, token: string, renewToken: string }> {
+        let users = this.container.get<QueryUserService>("QueryUserService");
+        let user = await users.getUserByNameAsync(this.context.user.tenant, this.context.user.name);
         // No user found with that username
         if (!user || user.disabled) {
             throw new Error("Invalid user");
         }
 
         try {
-            await this.verifyTokenAsync({ token: data.renewToken, tenant: this.requestContext.tenant });
+            let tokens = this.container.get<IAuthenticationStrategy>(DefaultServiceNames.AuthenticationStrategy);
+            await tokens.verifyTokenAsync(this.context, data.renewToken, this.context.user.tenant);
         }
         catch (e) {
             throw new Error("Invalid renew token");
@@ -53,14 +55,9 @@ export class TokenHandler extends AbstractActionHandler implements ITokenService
     }
 
     @Action({ description: "Create a new jwt token", action: "createToken", outputSchema: "string" })
-    createTokenAsync(): Promise<string> {
-        let ctx = this.requestContext;
-        let tokens = this.container.get<ITokenService>(DefaultServiceNames.TokenService);
+    createTokenAsync(): Promise<{ expiresIn: number, token: string, renewToken: string }> {
+        let ctx = this.context;
+        let tokens = this.container.get<IAuthenticationStrategy>(DefaultServiceNames.BearerTokenService);
         return tokens.createTokenAsync(ctx.user);
-    }
-
-    verifyTokenAsync(p: VerifyTokenParameter): Promise<any> {
-        let tokens = this.container.get<ITokenService>(DefaultServiceNames.TokenService);
-        return tokens.verifyTokenAsync(p);
     }
 }

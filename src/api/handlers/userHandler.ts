@@ -1,6 +1,5 @@
 import { QueryHandler, ActionHandler, DefaultActionHandler, DefaultQueryHandler } from "vulcain-corejs";
 import { User } from "../models/user";
-import { IQueryUserService } from '../../api/services';
 import sanitize from 'mongo-sanitize';
 
 @ActionHandler({ async: false, scope: "user:admin", schema: "User", serviceName: "UserService" })
@@ -13,7 +12,7 @@ export class UserHandler extends DefaultActionHandler {
 }
 
 @QueryHandler({ scope: "user:admin", schema: "User", serviceName: "QueryUserService" })
-class QueryUserService extends DefaultQueryHandler<User> implements IQueryUserService {
+export class QueryUserService extends DefaultQueryHandler<User> {
 
     async getAsync(name: string) {
 
@@ -25,26 +24,26 @@ class QueryUserService extends DefaultQueryHandler<User> implements IQueryUserSe
     }
 
     async getUserByNameAsync(tenant: string, name: string) {
-        let t = this.requestContext.tenant;
+        let t = this.context.user.tenant;
         try {
-            this.requestContext.tenant = tenant;
+            this.context.user.tenant = tenant;
             let list = await super.getAllAsync({ name: sanitize(name) }, 2);
             return list && list.length === 1 ? list[0] : null;
         }
         finally {
-            this.requestContext.tenant = t;
+            this.context.user.tenant = t;
         }
     }
 
     async hasUsersAsync(tenant: string): Promise<boolean> {
-        let t = this.requestContext.tenant;
+        let t = this.context.user.tenant;
         try {
-            this.requestContext.tenant = tenant;
+            this.context.user.tenant = tenant;
             let list = await super.getAllAsync({}, 1);
             return list && list.length > 0;
         }
         finally {
-            this.requestContext.tenant = t;
+            this.context.user.tenant = t;
         }
     }
 

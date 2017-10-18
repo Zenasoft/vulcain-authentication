@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import {TestContainer, DefaultActionHandler, DefaultQueryHandler, QueryHandler, Query, ActionHandler, Model, Property, RequestContext, IContainer} from 'vulcain-corejs';
+import {DefaultActionHandler, DefaultQueryHandler, QueryHandler, Query, ActionHandler, Model, Property, IContainer, TestContext} from 'vulcain-corejs';
 
 @Model()
 class TestModel {
@@ -11,40 +11,30 @@ class TestModel {
     Date: number;
 }
 
-@ActionHandler({schema: TestModel, scope:"?"})
+@ActionHandler({schema: "TestModel", scope:"?"})
 class TestActionHandler extends DefaultActionHandler {
-    constructor(container: IContainer) {
-        super(container);
-        this.requestContext = RequestContext.createMock(container);
-    }
 }
 
-@QueryHandler({scope:"?", schema:TestModel, serviceName:"TestQueryService"})
+@QueryHandler({scope:"?", schema: "TestModel", serviceName:"TestQueryService"})
 class TestQueryHandler extends DefaultQueryHandler<TestModel> {
-    constructor(container: IContainer) {
-        super(container);
-        this.requestContext = RequestContext.createMock(container);
-    }
 }
 
-let container = new TestContainer("Test");
-
-beforeEach(async function () {
-});
+let context = new TestContext();
 
 describe("Default action handler", function () {
 
     it("should register query handler as a service", () => {
-        expect(container.get("TestQueryService")).to.be.not.null;
+        expect(context.container.get("TestQueryService")).to.be.not.null;
     });
 
     it("should create an entity", async function (done) {
 
         try {
-            let actionHandler = new TestActionHandler(container);
+            let actionHandler = context.createHandler<TestActionHandler>(TestActionHandler);
             let entity = { firstName: "elvis", lastName: "Presley" };
             await actionHandler.createAsync(entity);
-            let query:any = container.get("TestQueryService");
+
+            let query = context.getService<TestQueryHandler>("TestQueryService");
             entity = await query.getAsync("Presley");
             expect(entity).to.be.not.null;
             done();

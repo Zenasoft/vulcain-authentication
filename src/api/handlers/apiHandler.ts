@@ -1,4 +1,3 @@
-import { IApiKeyService, IQueryApiService } from "../services";
 import {
     IContainer,
     Query,
@@ -9,21 +8,21 @@ import {
     QueryHandler,
     DefaultQueryHandler,
     EventNotificationMode,
-    VerifyTokenParameter,
     DefaultServiceNames
 } from "vulcain-corejs";
 import { ApiKey } from "../models/apiKey";
 import sanitize from 'mongo-sanitize';
+import { VerifyTokenParameter } from "./verifyTokenParameter";
 
-@ActionHandler({ async: false, scope: "token:admin", schema: "ApiKey", serviceName: DefaultServiceNames.ApiKeyService, eventMode: EventNotificationMode.never })
-export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
+@ActionHandler({ async: false, scope: "token:admin", schema: "ApiKey", eventMode: EventNotificationMode.never })
+export class ApiHandler extends DefaultActionHandler {
 
     constructor(@Inject("Container") container: IContainer) {
         super(container);
     }
 
     createAsync(data: ApiKey) {
-        data.tenant = data.tenant || this.requestContext.tenant;
+        data.tenant = data.tenant || this.context.user.tenant;
         return super.createAsync(data);
     }
 
@@ -31,26 +30,22 @@ export class ApiHandler extends DefaultActionHandler implements IApiKeyService {
     verifyTokenAsync(params: VerifyTokenParameter): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                let apis = this.container.get<IQueryApiService>("QueryApiService");
+                let apis = this.container.get<QueryApiService>("QueryApiService");
                 let token = await apis.getApiAsync(params.tenant, params.token);
-                if (token) {
-                    resolve({ token: token, user: { name: token.userName, id: token.userId, tenant: token.tenant, data: token.data } });
-                    return;
-                }
-                reject({ message: "Invalid api key" });
+                resolve(!!token);
             }
             catch (err) {
-                reject(err);
+                resolve(false);
             }
         });
     }
 }
 
 @QueryHandler({ scope: "token:admin", schema: "ApiKey", serviceName: "QueryApiService" })
-class QueryApiService extends DefaultQueryHandler<ApiKey> implements IQueryApiService {
+class QueryApiService extends DefaultQueryHandler<ApiKey> {
     @Query({ description: "Get an api key", action: "get" })
     getApiAsync(tenant: string, id: string) {
-        this.requestContext.tenant = tenant;
+        this.context.user.tenant = tenant;
         return <Promise<ApiKey>>super.getAsync(sanitize(id));
     }
 }

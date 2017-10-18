@@ -6,13 +6,11 @@
         {
             "taskName": "default",
             "isBuildCommand": true,
-            "isWatching": false,
             "problemMatcher": "$tsc"
         },
         {
             "taskName": "test",
             "isTestCommand": true,
-            "isWatching": false,
             "problemMatcher": "$tsc"
         }
     ]

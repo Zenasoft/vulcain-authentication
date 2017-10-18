@@ -6,6 +6,7 @@ var gulp = require("gulp"),
     ts = require("gulp-typescript"),
     merge = require('merge2'),
     fse = require('fs-extra'),
+    typescript = require('typescript'),
     mocha = require('gulp-mocha'),
     istanbul = require('gulp-istanbul'),
     sourcemaps = require('gulp-sourcemaps'),
@@ -15,39 +16,52 @@ var gulp = require("gulp"),
 // Base root directory for source map
 process.on('uncaughtException', console.error.bind(console));
 
-gulp.task('default', ['compile-ts']);
+gulp.task('default', ['compile-test']);
 
 gulp.task('tslint', function () {
     return gulp.src('./src/**/*.ts')
-        .pipe(tslint({ formatter: "prose" }))
-        .pipe(tslint.report());
+        .pipe(tslint({formatter: "prose"}))
+        .pipe(tslint.report())
+        .on("error", function () {
+            process.exit(1);
+        });
+    ;
 });
 
 // -----------------------------------
 // Test
 // -----------------------------------
-gulp.task("compile-test", ['compile-ts'], function () {
-    var tsProject = ts.createProject(
-        './tsconfig.json',
-        {
-            typescript: require('typescript')    // must be a project package dependency
-        });
-
-    var tsResult = gulp.src([
-        "./test/**/*.ts"
-    ], { base: 'test/' })
-        .pipe(sourcemaps.init())
-        .pipe(tsProject());
-
-    return tsResult.js
-        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: "../test" }))
-        .pipe(gulp.dest("dist-test/"));
+gulp.task('test', ['istanbul:hook'], function () {
+    return gulp.src(['./dist-test/**/*.js'])
+        .pipe(mocha())
+        // Creating the reports after tests ran
+        .pipe(istanbul.writeReports());
+        // Enforce a coverage of at least 90%
+       // .pipe(istanbul.enforceThresholds({ thresholds: { global: 90 } }));
 });
 
-gulp.task("istanbul:hook", function () {
-    return gulp.src(['dist/**/*.js'])
-        // Covering files
-        .pipe(istanbul())
+gulp.task("compile-test", ['compile-ts'], function () {
+    var tsProject = ts.createProject('./test/tsconfig.json', { typescript });
+
+    var tsResult = tsProject.src()
+        .pipe(sourcemaps.init())
+        .pipe(tsProject())
+        .once("error", function () {
+            this.once("finish", function () {
+                process.exit(1)
+
+            });
+        });
+
+    return tsResult.js
+        .pipe(sourcemaps.write('../dist-test', {includeContent: false, sourceRoot:  "../test"}))
+        .pipe(gulp.dest("dist-test"));
+});
+
+gulp.task("istanbul:hook", ['compile-test'], function () {
+    return gulp.src(['./dist/**/*.js'])
+    // Covering files
+        .pipe(istanbul({ includeUntested: true }))
         // Force `require` to return covered files
         .pipe(istanbul.hookRequire());
 });
@@ -55,41 +69,30 @@ gulp.task("istanbul:hook", function () {
 // -----------------------------------
 // Compilation
 // -----------------------------------
-function incrementVersion() {
-    var dockerfile = Path.join(__dirname, "Dockerfile");
-    if (!fs.existsSync(dockerfile))
-        return;
-    var content = fs.readFileSync(dockerfile, 'UTF-8');
-    var version = /^(LABEL vulcain\.version=[0-9]+\.[0-9]+\.)([0-9]+)/m;
-    var matches = version.exec(content);
-    var build = parseInt(matches[2]);
-    build += 1;
-    content = content.replace(version, '$1' + build.toString());
-    fs.writeFileSync(dockerfile, content, 'UTF-8');
-}
 
 // https://www.npmjs.com/package/gulp-typescript
-gulp.task("compile-ts", ['tslint', 'clean'], function () {
-    var tsProject = ts.createProject(
-        './tsconfig.json',
-        {
-            typescript: require('typescript')    // must be a project package dependency
+gulp.task("compile-ts", [ 'clean'], function () {
+    var tsProject = ts.createProject('./src/tsconfig.json', { typescript });
+
+    var tsResult = tsProject.src()
+        .pipe(sourcemaps.init())
+        .pipe(tsProject())
+        .once("error", function () {
+            this.once("finish", function () {
+                process.exit(1)
+            });
         });
 
-    var tsResult = gulp.src([
-        "./src/**/*.ts"
-    ])
-        .pipe(sourcemaps.init())
-        .pipe(tsProject());
-
     return merge([
-        tsResult.dts
-            .pipe(gulp.dest('dist')),
-        tsResult.js
-            .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: "." }))
-            .pipe(gulp.dest('dist'))
-    ]
+            tsResult.dts
+                .pipe(gulp.dest('dist')),
+            tsResult.js
+                .pipe(sourcemaps.write('../dist', {includeContent: false, sourceRoot: "../src"}))
+                .pipe(gulp.dest('dist'))
+        ]
     );
 });
 
-gulp.task('clean', function (done) { fse.remove('dist', done); });
+gulp.task('clean', function (done) {
+    fse.remove('dist', done);
+});
