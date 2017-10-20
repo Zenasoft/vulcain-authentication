@@ -32,9 +32,9 @@ export class TokenHandler extends AbstractActionHandler {
     }
 
     @Action({ description: "Renew a valid jwt token", action: "renewToken", inputSchema: "RenewData", outputSchema: "string" })
-    async renewTokenAsync(data: RenewData): Promise<{ expiresIn: number, token: string, renewToken: string }> {
+    async renewToken(data: RenewData): Promise<{ expiresIn: number, token: string, renewToken: string }> {
         let users = this.container.get<QueryUserService>("QueryUserService");
-        let user = await users.getUserByNameAsync(this.context.user.tenant, this.context.user.name);
+        let user = await users.getUserByName(this.context.user.tenant, this.context.user.name);
         // No user found with that username
         if (!user || user.disabled) {
             throw new Error("Invalid user");
@@ -42,7 +42,7 @@ export class TokenHandler extends AbstractActionHandler {
 
         try {
             let tokens = this.container.get<IAuthenticationStrategy>(DefaultServiceNames.AuthenticationStrategy);
-            await tokens.verifyTokenAsync(this.context, data.renewToken, this.context.user.tenant);
+            await tokens.verifyToken(this.context, data.renewToken, this.context.user.tenant);
         }
         catch (e) {
             throw new Error("Invalid renew token");
@@ -50,14 +50,14 @@ export class TokenHandler extends AbstractActionHandler {
 
         //let options = { issuer: this.issuer, expiresIn: this.tokenExpiration };
 
-        let result = this.createTokenAsync();
+        let result = this.createToken();
         return result;
     }
 
     @Action({ description: "Create a new jwt token", action: "createToken", outputSchema: "string" })
-    createTokenAsync(): Promise<{ expiresIn: number, token: string, renewToken: string }> {
+    createToken(): Promise<{ expiresIn: number, token: string, renewToken: string }> {
         let ctx = this.context;
         let tokens = this.container.get<IAuthenticationStrategy>(DefaultServiceNames.BearerTokenService);
-        return tokens.createTokenAsync(ctx.user);
+        return tokens.createToken(ctx.user);
     }
 }

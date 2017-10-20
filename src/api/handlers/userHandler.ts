@@ -4,7 +4,7 @@ import sanitize from 'mongo-sanitize';
 
 @ActionHandler({ async: false, scope: "user:admin", schema: "User", serviceName: "UserService" })
 export class UserHandler extends DefaultActionHandler {
-    async validateUserAsync(user: User, action: string) {
+    async validateUser(user: User, action: string) {
         if (action === "create" && !user.password) {
             return ["Password is required"];
         }
@@ -14,20 +14,20 @@ export class UserHandler extends DefaultActionHandler {
 @QueryHandler({ scope: "user:admin", schema: "User", serviceName: "QueryUserService" })
 export class QueryUserService extends DefaultQueryHandler<User> {
 
-    async getAsync(name: string) {
+    async get(name: string) {
 
-        let user = await super.getAsync(sanitize(name));
+        let user = await super.get(sanitize(name));
         if (user) {
             user.password = undefined;
         }
         return user;
     }
 
-    async getUserByNameAsync(tenant: string, name: string) {
+    async getUserByName(tenant: string, name: string) {
         let t = this.context.user.tenant;
         try {
             this.context.user.tenant = tenant;
-            let list = await super.getAllAsync({ name: sanitize(name) }, 2);
+            let list = await super.getAll({ name: sanitize(name) }, 2);
             return list && list.length === 1 ? list[0] : null;
         }
         finally {
@@ -35,11 +35,11 @@ export class QueryUserService extends DefaultQueryHandler<User> {
         }
     }
 
-    async hasUsersAsync(tenant: string): Promise<boolean> {
+    async hasUsers(tenant: string): Promise<boolean> {
         let t = this.context.user.tenant;
         try {
             this.context.user.tenant = tenant;
-            let list = await super.getAllAsync({}, 1);
+            let list = await super.getAll({}, 1);
             return list && list.length > 0;
         }
         finally {

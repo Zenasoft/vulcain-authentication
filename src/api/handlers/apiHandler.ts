@@ -21,17 +21,17 @@ export class ApiHandler extends DefaultActionHandler {
         super(container);
     }
 
-    createAsync(data: ApiKey) {
+    create(data: ApiKey) {
         data.tenant = data.tenant || this.context.user.tenant;
-        return super.createAsync(data);
+        return super.create(data);
     }
 
     @Action({ description: "Verify an api key", outputSchema: "boolean" })
-    verifyTokenAsync(params: VerifyTokenParameter): Promise<boolean> {
+    verifyToken(params: VerifyTokenParameter): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
                 let apis = this.container.get<QueryApiService>("QueryApiService");
-                let token = await apis.getApiAsync(params.tenant, params.token);
+                let token = await apis.getApi(params.tenant, params.token);
                 resolve(!!token);
             }
             catch (err) {
@@ -44,8 +44,8 @@ export class ApiHandler extends DefaultActionHandler {
 @QueryHandler({ scope: "token:admin", schema: "ApiKey", serviceName: "QueryApiService" })
 class QueryApiService extends DefaultQueryHandler<ApiKey> {
     @Query({ description: "Get an api key", action: "get" })
-    getApiAsync(tenant: string, id: string) {
+    getApi(tenant: string, id: string) {
         this.context.user.tenant = tenant;
-        return <Promise<ApiKey>>super.getAsync(sanitize(id));
+        return <Promise<ApiKey>>super.get(sanitize(id));
     }
 }

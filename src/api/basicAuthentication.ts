@@ -11,7 +11,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
         System.log.info(null, () => `Basic authentication is enabled.`);
     }
 
-    async verifyTokenAsync(ctx: IRequestContext, accessToken: string, tenant: string): Promise<UserContextData> {
+    async verifyToken(ctx: IRequestContext, accessToken: string, tenant: string): Promise<UserContextData> {
         let username: string;
         let password: string;
         try {
@@ -30,7 +30,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
             let users = ctx.container.get<QueryUserService>("QueryUserService");
             if (username === "admin" && password === "admin") {
                 // Works only on bootstrap when there is no users yet
-                let hasUsers = (users && await users.hasUsersAsync(tenant));
+                let hasUsers = (users && await users.hasUsers(tenant));
                 if (!hasUsers) {
                     System.log.info(ctx, ()=> `User authentication: Connected with default admin profile`);
                     return  { claims: {}, name: "admin", displayName: "admin", scopes: ["*"], tenant};
@@ -41,7 +41,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
                 return null;
             }
 
-            let user = await users.getUserByNameAsync(tenant, username);
+            let user = await users.getUserByName(tenant, username);
             // No user found with that username
             if (!user || user.disabled) {
                 System.log.info(ctx, ()=>`User authentication: Invalid profile ${username} tenant ${tenant}`);
