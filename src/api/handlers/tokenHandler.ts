@@ -1,4 +1,4 @@
-import { Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IAuthenticationStrategy, IContainer, EventNotificationMode, DefaultServiceNames, ConfigurationProperty, Conventions, System, DynamicConfiguration } from 'vulcain-corejs';
+import { Model, Property, AbstractActionHandler, ActionHandler, Inject, Action, IAuthenticationStrategy, IContainer, EventNotificationMode, DefaultServiceNames, ConfigurationProperty, Conventions, Service, DynamicConfiguration } from 'vulcain-corejs';
 import { QueryUserService } from './userHandler';
 import { VerifyTokenParameter } from './verifyTokenParameter';
 

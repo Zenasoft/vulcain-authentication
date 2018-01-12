@@ -1,4 +1,4 @@
-import { System, Inject, Injectable, DefaultServiceNames, LifeTime, IAuthenticationStrategy, IRequestContext, UserContextData } from "vulcain-corejs";
+import { Service, Inject, Injectable, DefaultServiceNames, LifeTime, IAuthenticationStrategy, IRequestContext, UserContextData } from "vulcain-corejs";
 import { QueryUserService } from "./handlers/userHandler";
 
 
@@ -8,7 +8,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
     public readonly name = "basic";
 
     constructor() {
-        System.log.info(null, () => `Basic authentication is enabled.`);
+        Service.log.info(null, () => `Basic authentication is enabled.`);
     }
 
     async verifyToken(ctx: IRequestContext, accessToken: string, tenant: string): Promise<UserContextData> {
@@ -32,7 +32,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
                 // Works only on bootstrap when there is no users yet
                 let hasUsers = (users && await users.hasUsers(tenant));
                 if (!hasUsers) {
-                    System.log.info(ctx, ()=> `User authentication: Connected with default admin profile`);
+                    Service.log.info(ctx, ()=> `User authentication: Connected with default admin profile`);
                     return  { claims: {}, name: "admin", displayName: "admin", scopes: ["*"], tenant};
                 }
             }
@@ -44,7 +44,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
             let user = await users.getUserByName(tenant, username);
             // No user found with that username
             if (!user || user.disabled) {
-                System.log.info(ctx, ()=>`User authentication: Invalid profile ${username} tenant ${tenant}`);
+                Service.log.info(ctx, ()=>`User authentication: Invalid profile ${username} tenant ${tenant}`);
                 return null;
             }
 
@@ -53,7 +53,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
 
             // Password did not match
             if (!isMatch) {
-                System.log.info(ctx, ()=>`User authentication: Invalid password for ${username} tenant ${tenant}`);
+                Service.log.info(ctx, ()=>`User authentication: Invalid password for ${username} tenant ${tenant}`);
                 return null;
             }
 
@@ -61,7 +61,7 @@ export class BasicAuthentication implements IAuthenticationStrategy {
             return <any>user;
         }
         catch (err) {
-            System.log.error(ctx, err, ()=>`User authentication: Error for profile ${username} tenant ${tenant}`);
+            Service.log.error(ctx, err, ()=>`User authentication: Error for profile ${username} tenant ${tenant}`);
             return null;
         }
     }

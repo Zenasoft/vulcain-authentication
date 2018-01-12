@@ -28,7 +28,7 @@ export class QueryUserService extends DefaultQueryHandler<User> {
         try {
             this.context.user.tenant = tenant;
             let list = await super.getAll({ name: sanitize(name) }, 2);
-            return list && list.length === 1 ? list[0] : null;
+            return list.values && list.values.length === 1 ? list[0] : null;
         }
         finally {
             this.context.user.tenant = t;
@@ -40,7 +40,7 @@ export class QueryUserService extends DefaultQueryHandler<User> {
         try {
             this.context.user.tenant = tenant;
             let list = await super.getAll({}, 1);
-            return list && list.length > 0;
+            return list.values && list.values.length > 0;
         }
         finally {
             this.context.user.tenant = t;
